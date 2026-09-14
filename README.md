@@ -2,17 +2,21 @@
 
 A complete prototype that predicts heart disease risk using a **stacked hybrid quantum committee** (Quantum Kernel SVM + bagged VQC ensemble + single VQC + tuned classical SVM and Logistic Regression, combined by an out-of-fold meta-learner), with the Quantum Kernel SVM as the flagship pure-quantum model. Preprocessing: imputation, scaling, supervised ANOVA feature selection, and angle scaling for quantum encoding. The system includes a QML frontend for data entry, a FastAPI backend for serving predictions, and a training script that compares quantum vs classical models.
 
-Reference test-set results (Cleveland, 80/20 stratified split):
+Datasets: **Cleveland primary** — 303 patients in `data/heart.csv` (official headline split: 242 train / 61 test, `random_state=42`). **Combined expansion** — 918 real patients in `data/heart_combined.csv` built from all 4 UCI sources (Cleveland 303 + Hungarian 294 + Switzerland 123 + VA 200 − 2 duplicates) via `data/build_combined.py`; see `data/DATASET_PROVENANCE.md`. The Cleveland file is never overwritten.
+
+Reference test-set results (Cleveland, 80/20 stratified split, `random_state=42`, threshold tuned on train folds only):
 
 | Model | Accuracy | Precision | Recall | F1 |
 |---|---|---|---|---|
-| **Hybrid Quantum Committee (stacked)** | **0.85** | 0.85 | 0.82 | 0.84 |
-| SVM (tuned classical) | 0.85 | 0.85 | 0.82 | 0.84 |
-| VQC Ensemble (quantum) | 0.84 | 0.82 | 0.82 | 0.82 |
-| Random Forest (tuned classical) | 0.84 | 0.82 | 0.82 | 0.82 |
-| Logistic Regression (tuned classical) | 0.84 | 0.82 | 0.82 | 0.82 |
-| Quantum Kernel SVM (pure quantum) | 0.77 | 0.75 | 0.75 | 0.75 |
-| VQC (pure quantum) | 0.75 | 0.74 | 0.71 | 0.73 |
+| **Hybrid Quantum Committee (stacked)** — tied best | **0.8525** | 0.8519 | 0.8214 | 0.8364 |
+| SVM (tuned classical) — tied best | **0.8525** | 0.8519 | 0.8214 | 0.8364 |
+| VQC Ensemble (quantum) | 0.8361 | 0.8214 | 0.8214 | 0.8214 |
+| Random Forest (tuned classical) | 0.8361 | 0.8214 | 0.8214 | 0.8214 |
+| Logistic Regression (tuned classical) | 0.8361 | 0.8214 | 0.8214 | 0.8214 |
+| Quantum Kernel SVM (pure quantum) | 0.7705 | 0.7500 | 0.7500 | 0.7500 |
+| VQC (pure quantum) | 0.7541 | 0.7407 | 0.7143 | 0.7273 |
+
+The headline 85.25% is **joint-best** (hybrid ties tuned SVM) on the fixed official split; mean across random splits is ~80% ±2.5% (n=61 binomial noise — see `AUDIT.md` Proof 4). 86.88% is reachable only by tuning the threshold on the test set (leakage — not reported). A leakage-free push toward 87–88% requires an expanded OOF-selected committee (see `scripts/push_accuracy.py` and `DELIVERY.md`).
 
 The headline model is a hybrid: three genuine quantum models (quantum kernel SVM, VQC ensemble, VQC) are first-class members of a stacked ensemble whose meta-learner is fit on out-of-fold predictions (no test leakage). Classical baselines are tuned with 5-fold cross-validated grid search so the comparison is fair.
 
@@ -23,6 +27,7 @@ py -3.11 -m venv venv                  # Python 3.11 or 3.12 (see Requirements)
 source venv/bin/activate               # Windows: venv\Scripts\activate
 pip install -r requirements.txt        # or: pip install -r requirements-lock.txt
                                        # (lockfile = exact tested transitive chain, incl. PennyLane deps)
+python data/build_combined.py          # optional: builds 918-row combined set (all 4 UCI sources)
 python backend/train.py                # only if backend/artifacts/ is missing (~5-10 min, CPU)
 python frontend/run_ui.py              # EVERYTHING: starts the API too, then opens the UI
 
@@ -38,11 +43,11 @@ individually.
 
 ## Deliverables (as per project table)
 
-1. **Data Pre-processing & Feature Engineering** – Imputation, scaling, supervised ANOVA selection of the top 4 clinical features, and rescaling to [0, π] for angle encoding. The Cleveland target (0–4) is binarized to disease present/absent.
+1. **Data Pre-processing & Feature Engineering** – Imputation, scaling, supervised ANOVA selection of the top 4 clinical features, and rescaling to [0, π] for angle encoding. The Cleveland target (0–4) is binarized to disease present/absent. Combined builder `data/build_combined.py` produces `data/heart_combined.csv` (918) with provenance in `data/DATASET_PROVENANCE.md`.
 2. **Hybrid Quantum-Classical Architecture** – QML frontend + FastAPI backend + stacked hybrid committee (served at `/predict`).
 3. **Quantum Machine Learning Models** – Three complementary models: (a) **Quantum Kernel SVM** – a projective (fidelity) quantum kernel computed from the re-uploading feature map, with cross-validated kernel regularization C; (b) **bagged VQC ensemble** – bootstrap-aggregated variational circuits; (c) **VQC** – 4 qubits, 4 data re-uploading layers (RY + trainable-scale encoding between trainable Rot + CNOT-ring blocks), trainable multi-qubit Z-readout, Adam with cosine learning-rate decay and L2 regularization.
 4. **Prediction & Decision Support** – Probability output, risk level (Low/Moderate/High), tailored recommendation, AND explainability (top contributing features).
-5. **Software Platform / Prototype** – Full working application with UI, API, and classical baseline comparison.
+5. **Software Platform / Prototype** – Full working application with UI, API, and classical baseline comparison. See `DELIVERY.md` for the per-deliverable file/metrics map.
 
 ## Requirements
 
@@ -63,7 +68,6 @@ individually.
    ```
 
 3. **Install Python dependencies**:
-
 ```bash
 pip install -r requirements.txt
 ```
@@ -72,14 +76,19 @@ pip install -r requirements.txt
    dependency pinned exactly as tested), use `requirements-lock.txt` instead —
    recommended if a fresh install ever misbehaves on your machine.
 
-4. **Train the model** (downloads the Cleveland dataset automatically on first run; takes roughly 5–10 minutes on a normal CPU because the stacking step retrains the quantum models across 5 cross-validation folds):
+4. **(Optional) Build the combined dataset** — 918 real patients from all 4 UCI sources:
+```
+python data/build_combined.py
+```
+   Saves `data/heart_combined.csv` + `data/DATASET_PROVENANCE.md`; `data/heart.csv` is never modified. Headline training still uses Cleveland by default.
+
+5. **Train the model** (downloads the Cleveland dataset automatically on first run; takes roughly 5–10 minutes on a normal CPU because the stacking step retrains the quantum models across 5 cross-validation folds):
 
 ```
 python backend/train.py
 ```
 
 This:
-
 - Binarizes the Cleveland target (0 → no disease, 1–4 → disease)
 - Trains the VQC, bagged VQC ensemble, and quantum kernel SVM (with CV-tuned kernel regularization)
 - Trains 5-fold CV-tuned classical baselines (Random Forest, SVM, Logistic Regression)
@@ -129,6 +138,7 @@ ignored). Every row is scored by the served model in one request — the repo's 
 
 ```bash
 curl -X POST http://localhost:8000/predict/csv -F "file=@data/heart.csv"
+curl -X POST http://localhost:8000/predict/csv -F "file=@data/heart_combined.csv"
 ```
 
 ### Decision threshold
@@ -184,7 +194,7 @@ The UI displays the features contributing to the prediction. Because the pipelin
 - **Risk thresholds**: The decision threshold is auto-tuned (Youden's J) and
   stored in the committee artifact; the Moderate/High band edges scale with it
   in `backend/app.py` (`_risk_bands`).
-- **Dataset**: Replace URL in `backend/train.py` with your own CSV (must have 13 features + binary target).
+- **Dataset**: By default `backend/train.py` loads `data/heart.csv` (Cleveland). To experiment on the combined 918, point it at `data/heart_combined.csv` or replace the URL in `train.py` with your own CSV (must have 13 features + binary target).
 
 ## Verification & Experiment Scripts
 
@@ -203,6 +213,8 @@ while the API is serving:
 ./venv/Scripts/python.exe scripts/push_accuracy.py --quick   # smoke test (~2 min, toy circuits)
 ./venv/Scripts/python.exe scripts/push_accuracy.py           # real run (~25 min)
 ```
+
+Full delivery map: see `DELIVERY.md`. Combined-dataset provenance: `data/DATASET_PROVENANCE.md`.
 
 ### Extending the committee (for new contributors)
 
@@ -224,4 +236,3 @@ while the API is serving:
 - **PennyLane errors**: Ensure all dependencies are installed.
 - **Install fails on Python 3.13+**: Use Python 3.11 or 3.12 for the venv (the pinned scientific packages don't build on 3.13 yet).
 - **Slow training**: The stacked committee retrains quantum models across 5 CV folds; on a slow machine reduce `n_members` and `epochs` in `backend/train.py`.
-

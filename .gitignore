@@ -16,3 +16,8 @@ data/heart.csv
 
 .freebuff/
 .vscode/
+
+# Keep combined dataset (real UCI patients, not regenerable offline)
+!data/heart_combined.csv
+!data/DATASET_PROVENANCE.md
+!data/build_combined.py

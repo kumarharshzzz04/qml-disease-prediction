@@ -42,8 +42,11 @@ Everything here is measured from the actual code and artifacts.
 
 ## 2. The Data (where learning comes from)
 
-- **Dataset:** UCI Cleveland heart dataset — 303 patients, 13 clinical
-  features, stored in `data/heart.csv`.
+- **Dataset (primary):** UCI Cleveland heart dataset — 303 patients, 13 clinical
+  features, stored in `data/heart.csv` (official headline split: 242 train / 61 test).
+- **Combined expansion:** all 4 UCI sources via `data/build_combined.py` — 918 patients
+  in `data/heart_combined.csv` (303 Cleveland + 294 Hungarian + 123 Switzerland + 200 VA
+  − 2 exact duplicates; binarized, `?`→empty; provenance in `data/DATASET_PROVENANCE.md`).
 - **Target:** `0` = no disease, `1–4` = disease → binarized to 0/1
   (`binarize_target` in `backend/preprocess.py`).
 - **Split:** 80/20 stratified, `random_state=42` → **242 train / 61 test**.
@@ -303,9 +306,13 @@ scripts/
   verify_accuracy.py  rebuild split + reproduce 0.8525 + clinical probes
   verify_no_leakage.py four leakage proofs (fast proofs ~2 min)
   push_accuracy.py    experiment: can more members beat the committee?
-data/heart.csv        the 303-patient dataset
+data/heart.csv        the 303-patient Cleveland dataset (official headline)
+data/heart_combined.csv the 918-patient combined dataset (all 4 UCI sources; see DATASET_PROVENANCE.md)
+data/build_combined.py  builder for the combined set (reproducible, ?→empty, binarized)
+data/DATASET_PROVENANCE.md provenance for the combined set
 plots/model_comparison.png   the evaluation chart
 AUDIT.md              leakage-audit write-up
+DELIVERY.md           delivery-table fulfillment map
 ```
 
 ---
