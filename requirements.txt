@@ -1,0 +1,16 @@
+# Pinned versions are tested together on Python 3.11 (see README).
+# NOTE: these pins have no wheels for Python 3.13+, so use Python 3.9-3.12.
+#
+# For a fully reproducible environment (PennyLane's whole transitive chain
+# frozen exactly as tested), install from the lockfile instead:
+#   pip install -r requirements-lock.txt
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pennylane==0.33.1
+scikit-learn==1.3.2
+pandas==2.1.3
+numpy==1.26.1
+matplotlib==3.8.2
+httpx==0.25.2  # only needed for FastAPI TestClient (tests)
+python-multipart==0.0.6  # CSV upload endpoint (/predict/csv)
+PyQt5==5.15.9  # runs the QML frontend via frontend/run_ui.py (no Qt install needed)
