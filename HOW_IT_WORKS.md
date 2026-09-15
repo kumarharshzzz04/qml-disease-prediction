@@ -243,7 +243,9 @@ UI gauge + colored risk + advice + feature-importance bars + history entry
 
 ---
 
-## 8. Results (test set = 61 real unseen patients)
+## 8. Results
+
+### 8a. Cleveland primary (test set = 61 real unseen patients, `data/heart.csv`)
 
 | Model | Accuracy | Precision | Recall | F1 |
 |---|---|---|---|---|
@@ -254,7 +256,20 @@ UI gauge + colored risk + advice + feature-importance bars + history entry
 | Quantum Kernel SVM (pure quantum) | 0.7705 | 0.7500 | 0.7500 | 0.7500 |
 | VQC (pure quantum) | 0.7541 | 0.7407 | 0.7143 | 0.7273 |
 
-Honest summary: the quantum-led committee **ties the best classical model
+### 8b. Combined 918 (test set = 184, `data/heart_combined.csv`, 734/184 `random_state=42`, `verify_combined.py`, leakage-free OOF)
+
+| Model (all 13 features unless noted) | Accuracy | F1 | ROC | n |
+|---|---|---|---|---|
+| **ExtraTrees (best classical, 13)** | **0.8478** | 0.857 | 0.9225 | 156/184 |
+| **Stacked RF+ET (OOF-thr 0.49, hybrid-classical)** | **0.8424** (@0.5 0.8370) | 0.8585 | 0.9258 | 155/184 |
+| Quantum 4-feature branch (cp/thalach/exang/oldpeak) | 0.7989 | 0.8279 | 0.8760 | 147/184 |
+| SVM (13) | 0.8098 | — | 0.9069 | 149/184 |
+
+Combined is harder (609 ca + 484 thal missing vs 6 in Cleveland); with 13 features both hybrid and best classical converge to ~84–85% — **again a tie within 1 patient**, not a hybrid win. Oracle test-thr 85.87% @0.39 is leakage — not reported.
+
+Verified leakage-free: `scripts/verify_combined.py` (same protocol as Cleveland: preprocessor fit train-only, GridSearchCV cv=5 train-only, OOF stacking + thr on OOF train folds only, ONE test eval; canaries SVM 0.639 LR 0.579 chance; 0 duplicates; 1752 total NAs).
+
+Honest summary (both datasets): the committee **ties the best classical model
 while carrying three quantum models inside it**; the pure-quantum ensemble
 matches RF/LR. On 303 samples quantum and classical are in a statistical
 tie — the defensible claim is "matches or exceeds," not "strictly beats."
@@ -265,6 +280,20 @@ artifacts + clinical sanity checks), `scripts/verify_no_leakage.py`
 (four leakage proofs, results in `AUDIT.md`).
 
 ---
+
+## FAQ — Why quantum if it ties?
+
+**Q1 Why quantum if hybrid just ties classical?**
+Telling the truth wins. Cleveland 85.25% = 52/61 (hybrid = tuned SVM) and Combined @4 qubits 79.89% = 147/184 (hybrid = KNN) are ties within 1 patient (n=61 ±5pp, n=184 ±3.2pp). Hybrid **carries 3 real quantum models** (QKernel, bagged VQC, VQC) inside the committee — pure quantum VQC-Ensemble alone already 83.61% = RF 83.61% — so quantum **matches** classical for free. Claim is "matches-or-exceeds, leakage-free and quantum-ready" not "strictly beats".
+
+**Q2 Isn't quantum expensive?**
+Not at 4 qubits. `2^4=16` amplitudes -> trains in ~5 min on laptop, inference ~20 ms (`/predict`), same laptop as sklearn. `2^13=8192` would be 512x cost/hours + QPU noise for +5 pp that classical ET already gets (84.78% @13) — so we **did not** go there. Cost argument fails because we stayed cheap.
+
+**Q3 Is the accuracy real or leakage?**
+Verified live in 2-3 min: `scripts/verify_accuracy.py` PASS 52/61 + 8/8 clinical flips · `scripts/verify_no_leakage.py 1 3` PASS P1+P3 (canaries 0.54/0.58/0.55 approx chance) · `scripts/verify_combined.py` same OOF-only threshold on train folds, single test eval, 0 dupes. Most 90% claims die because they tune threshold on test (86.88% @0.67, 85.87% @0.39) — we report that as leakage ceiling, not headline.
+
+**Q4 Why not push to 87-88%?**
+`n=61` -> one patient = 1.64 pp; mean over random splits is ~80% +-2.5% (`AUDIT.md` P4). 85.25% -> 86.88% is literally 52/61 -> 53/61. Leakage-free 87-88% via OOF expansion (`scripts/push_accuracy.py`, fresh per-fold quantum, 25 min) is possible but still within noise and dilutes quantum signal. Honest headline is tied 85.25% (Cleveland) + tied 79.89% @4 qubits (918) / 84.78% tied ceiling @13.
 
 ## 9. Tech stack (and why each piece)
 

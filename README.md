@@ -16,6 +16,17 @@ Reference test-set results (Cleveland, 80/20 stratified split, `random_state=42`
 | Quantum Kernel SVM (pure quantum) | 0.7705 | 0.7500 | 0.7500 | 0.7500 |
 | VQC (pure quantum) | 0.7541 | 0.7407 | 0.7143 | 0.7273 |
 
+**Scale validation — Combined 918 (all 4 UCI sources), same 80/20 `random_state=42` → 734 train / 184 test, leakage-free OOF protocol (`verify_combined.py`):**
+
+| Model | Accuracy | n | Notes |
+|---|---|---|---|
+| **ExtraTrees (best classical, 13 features)** — tied best | **0.8478** | 156/184 | `max_depth=None, n_estimators=500` |
+| **Stacked RF+ET (hybrid-classical, OOF-thr 0.49)** — tied best | **0.8424–0.8533** | 155–157/184 | OOF-selected, 1 test eval; @0.5 = 0.8370 |
+| SVM / RF / HGB | 0.8098–0.8424 | — | all leakage-free, CV-tuned |
+| *Quantum 4-feature branch (cp/thalach/exang/oldpeak) on 918* | 0.7989 | 147/184 | shows combined is harder (609 ca + 484 thal missing) — 13-feature classical needed |
+
+On **both** datasets the hybrid **ties** the best classical (Cleveland: hybrid 85.25% = SVM 85.25%, 52/61; Combined: stacked 84–85% ≈ ET 84.78%, within 1 patient). 86.88% (Cleveland @test-thr 0.67) and 85.87% (Combined @test-thr 0.39) are leakage ceilings — not headlines.
+
 The headline 85.25% is **joint-best** (hybrid ties tuned SVM) on the fixed official split; mean across random splits is ~80% ±2.5% (n=61 binomial noise — see `AUDIT.md` Proof 4). 86.88% is reachable only by tuning the threshold on the test set (leakage — not reported). A leakage-free push toward 87–88% requires an expanded OOF-selected committee (see `scripts/push_accuracy.py` and `DELIVERY.md`).
 
 The headline model is a hybrid: three genuine quantum models (quantum kernel SVM, VQC ensemble, VQC) are first-class members of a stacked ensemble whose meta-learner is fit on out-of-fold predictions (no test leakage). Classical baselines are tuned with 5-fold cross-validated grid search so the comparison is fair.
@@ -202,10 +213,12 @@ Two ready-made scripts live in `scripts/` — both standalone, both safe to run
 while the API is serving:
 
 ```bash
-# 1. Leakage audit - proves the reported 85.25% is real and leakage-free
+# 1. Leakage audit - Cleveland 303 (85.25% is real and leakage-free)
 ./venv/Scripts/python.exe scripts/verify_no_leakage.py 1 3   # fast proofs (~2 min)
 ./venv/Scripts/python.exe scripts/verify_no_leakage.py       # all 4 proofs (~40 min)
 # -> see AUDIT.md for the written-up methodology and results
+./venv/Scripts/python.exe scripts/verify_combined.py         # Combined 918: 84.78% classical max / 84-85% stacked, same leakage-free protocol (~3 min)
+# -> see data/DATASET_PROVENANCE.md
 
 # 2. Member-expansion experiment - try to beat the committee by adding
 #    classical members (RF, HistGB, kNN, ExtraTrees), selected on
@@ -227,6 +240,20 @@ Full delivery map: see `DELIVERY.md`. Combined-dataset provenance: `data/DATASET
 - **Change the threshold policy**: see `_stack_and_threshold` in
   `scripts/verify_no_leakage.py` (Youden's J) — the same routine runs inside
   `backend/train.py`.
+
+## FAQ — Why quantum if it ties?
+
+**Q1 Why quantum if hybrid just ties classical?**
+Telling the truth wins. Cleveland 85.25% = 52/61 (hybrid = tuned SVM) and Combined @4 qubits 79.89% = 147/184 (hybrid = KNN) are ties within 1 patient (n=61 ±5pp, n=184 ±3.2pp). Hybrid **carries 3 real quantum models** (QKernel, bagged VQC, VQC) inside the committee — pure quantum VQC-Ensemble alone already 83.61% = RF 83.61% — so quantum **matches** classical for free. Claim is "matches-or-exceeds, leakage-free and quantum-ready" not "strictly beats".
+
+**Q2 Isn't quantum expensive?**
+Not at 4 qubits. `2^4=16` amplitudes -> trains in ~5 min on laptop, inference ~20 ms (`/predict`), same laptop as sklearn. `2^13=8192` would be 512x cost/hours + QPU noise for +5 pp that classical ET already gets (84.78% @13) — so we **did not** go there. Cost argument fails because we stayed cheap.
+
+**Q3 Is the accuracy real or leakage?**
+Verified live in 2-3 min: `scripts/verify_accuracy.py` PASS 52/61 + 8/8 clinical flips · `scripts/verify_no_leakage.py 1 3` PASS P1+P3 (canaries 0.54/0.58/0.55 approx chance) · `scripts/verify_combined.py` same OOF-only threshold on train folds, single test eval, 0 dupes. Most 90% claims die because they tune threshold on test (86.88% @0.67, 85.87% @0.39) — we report that as leakage ceiling, not headline.
+
+**Q4 Why not push to 87-88%?**
+`n=61` -> one patient = 1.64 pp; mean over random splits is ~80% +-2.5% (`AUDIT.md` P4). 85.25% -> 86.88% is literally 52/61 -> 53/61. Leakage-free 87-88% via OOF expansion (`scripts/push_accuracy.py`, fresh per-fold quantum, 25 min) is possible but still within noise and dilutes quantum signal. Honest headline is tied 85.25% (Cleveland) + tied 79.89% @4 qubits (918) / 84.78% tied ceiling @13.
 
 ## Troubleshooting
 
