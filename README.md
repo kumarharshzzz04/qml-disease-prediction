@@ -118,20 +118,23 @@ uvicorn backend.app:app --reload
 
 The API will be available at `http://localhost:8000`.
 
-### 2. Run the QML Frontend
+### 2. Run the Quemeds Web Interface (Recommended)
 
-**Easiest (starts the API automatically if it isn't running):**
-
+```bash
+python frontend/run_web.py
 ```
+
+One-command launcher: starts the FastAPI backend (if not already running) on port 8000 and opens the **Quemeds** web interface in your default browser. Features patient risk assessment, feature importance explainability, CSV batch scoring, benchmark comparison, and methodology.
+
+### 3. Run the Desktop QML Frontend (Optional)
+
+```bash
 python frontend/run_ui.py
 ```
 
-Just run this one command — it detects whether the backend is up, starts it if
-needed (and shuts it down when you close the window), then opens the UI.
+Or with `qmlscene`:
 
-**Or** with a full Qt installation, use `qmlscene`:
-
-```
+```bash
 qmlscene frontend/main.qml
 ```
 
