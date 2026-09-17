@@ -337,6 +337,9 @@
       position: sticky;
       top: 0;
       z-index: 50;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     .api-status-badge {
@@ -433,7 +436,10 @@
     }
 
     .view.active {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 100%;
     }
 
     @keyframes fadeIn {
@@ -709,12 +715,20 @@
     }
 
     /* ============================================
-       METRIC CARDS ROW (4 CARDS)
+       METRIC CARDS ROW (3 CARDS — TASK #6)
        ============================================ */
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
+      align-items: stretch;
+    }
+
+    .methodology-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-items: stretch;
     }
 
     .metric-card {
@@ -842,36 +856,38 @@
       text-decoration: underline;
     }
 
-    /* Pipeline Flow */
+    /* Pipeline Flow — Responsive & Clean Fit */
     .pipeline-flow {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 4px;
+      gap: 4px;
+      width: 100%;
     }
 
     .pipeline-node {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 9px 13px;
+      gap: 6px;
+      padding: 8px 10px;
       background: var(--color-surface-subtle);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
-      font-size: 0.81rem;
+      font-size: 0.76rem;
       font-weight: 600;
       color: var(--color-text-secondary);
       white-space: nowrap;
-      flex-shrink: 0;
+      flex: 1 1 auto;
+      justify-content: center;
+      min-width: 0;
       transition: all var(--transition-fast);
     }
 
     .pipeline-node svg {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       stroke-width: 2;
+      flex-shrink: 0;
     }
 
     /* Quantum Node Highlight */
@@ -884,9 +900,11 @@
 
     .pipeline-arrow {
       color: var(--color-text-light);
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 300;
       flex-shrink: 0;
+      padding: 0 1px;
+      user-select: none;
     }
 
     /* ============================================
@@ -897,18 +915,20 @@
       display: grid;
       grid-template-columns: 1.25fr 0.95fr;
       gap: 20px;
+      align-items: stretch;
     }
 
     .quick-actions-container {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      height: 100%;
     }
 
     .action-cards-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
+      flex: 1;
     }
 
     .action-card {
@@ -921,6 +941,7 @@
       position: relative;
       cursor: pointer;
       transition: all var(--transition-fast);
+      height: 100%;
     }
 
     .action-card:hover {
@@ -940,6 +961,7 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 12px;
+      flex-shrink: 0;
     }
 
     .action-card-icon.cyan {
@@ -980,6 +1002,7 @@
       justify-content: center;
       font-size: 0.8rem;
       transition: transform var(--transition-fast);
+      flex-shrink: 0;
     }
 
     .action-card:hover .action-card-arrow {
@@ -989,10 +1012,18 @@
     }
 
     /* Recent Predictions Panel */
+    .recent-predictions-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     .recent-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      flex: 1;
+      justify-content: space-between;
     }
 
     .recent-item {
@@ -1068,6 +1099,7 @@
       display: grid;
       grid-template-columns: 1.45fr 0.95fr;
       gap: 20px;
+      align-items: stretch;
     }
 
     .perf-chart-container {
@@ -1480,7 +1512,7 @@
         display: none;
       }
 
-      .metrics-grid {
+      .methodology-metrics-grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
@@ -1494,6 +1526,12 @@
 
       .predict-grid {
         grid-template-columns: 1fr;
+      }
+
+      .pipeline-flow {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
       }
     }
 
@@ -1522,12 +1560,36 @@
         padding: 8px 18px 36px;
       }
 
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .methodology-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
       .action-cards-row {
         grid-template-columns: 1fr;
       }
 
       .batch-summary-cards {
         grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .pipeline-flow {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .pipeline-arrow {
+        transform: rotate(90deg);
+      }
+
+      .pipeline-node {
+        width: 100%;
+        justify-content: center;
       }
     }
 
@@ -2450,21 +2512,8 @@
             </div>
           </div>
 
-          <!-- Metric Cards Row (4 Cards) -->
+          <!-- Metric Cards Row (3 Cards — Task #6) -->
           <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-icon-box teal">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                  <polyline points="16 7 22 7 22 13" />
-                </svg>
-              </div>
-              <div class="metric-content">
-                <span class="metric-label">Accuracy</span>
-                <span class="metric-value">85.25%</span>
-                <span class="metric-subtext">Cleveland test set (n=61)</span>
-              </div>
-            </div>
 
             <div class="metric-card">
               <div class="metric-icon-box green">
@@ -2610,7 +2659,9 @@
           <!-- Two-Column Row: Quick Actions & Recent Predictions -->
           <div class="middle-grid">
             <div class="section-card quick-actions-container">
-              <div class="section-title">Quick Actions</div>
+              <div class="section-header-row">
+                <div class="section-title">Quick Actions</div>
+              </div>
 
               <div class="action-cards-row">
                 <div class="action-card" onclick="switchView('predict')">
@@ -2655,7 +2706,7 @@
             </div>
 
             <!-- Recent Predictions Feed -->
-            <div class="section-card">
+            <div class="section-card recent-predictions-card">
               <div class="section-header-row">
                 <div class="section-title">Recent Predictions</div>
                 <div class="section-action-link" onclick="switchView('predict')">View All →</div>
@@ -2720,8 +2771,8 @@
                       Set)</span></div>
                 </div>
                 <select class="metric-select-dropdown" id="overview-metric-select">
+                  <option value="f1" selected>F1 Score ˅</option>
                   <option value="accuracy">Accuracy ˅</option>
-                  <option value="f1">F1 Score ˅</option>
                   <option value="precision">Precision ˅</option>
                   <option value="recall">Recall ˅</option>
                 </select>
@@ -2731,37 +2782,37 @@
                 <div class="perf-row">
                   <span class="perf-name">Hybrid Quantum Committee</span>
                   <div class="perf-track">
-                    <div class="perf-bar primary" style="width: 85.25%;"></div>
+                    <div class="perf-bar primary" style="width: 83.64%;"></div>
                   </div>
-                  <span class="perf-val">0.8525</span>
+                  <span class="perf-val">0.8364</span>
                 </div>
                 <div class="perf-row">
                   <span class="perf-name">SVM (tuned)</span>
                   <div class="perf-track">
-                    <div class="perf-bar slate" style="width: 85.25%;"></div>
+                    <div class="perf-bar slate" style="width: 83.64%;"></div>
                   </div>
-                  <span class="perf-val">0.8525</span>
+                  <span class="perf-val">0.8364</span>
                 </div>
                 <div class="perf-row">
                   <span class="perf-name">VQC Ensemble</span>
                   <div class="perf-track">
-                    <div class="perf-bar cyan" style="width: 83.61%;"></div>
+                    <div class="perf-bar cyan" style="width: 82.14%;"></div>
                   </div>
-                  <span class="perf-val">0.8361</span>
+                  <span class="perf-val">0.8214</span>
                 </div>
                 <div class="perf-row">
                   <span class="perf-name">Random Forest (tuned)</span>
                   <div class="perf-track">
-                    <div class="perf-bar slate" style="width: 83.61%;"></div>
+                    <div class="perf-bar slate" style="width: 82.14%;"></div>
                   </div>
-                  <span class="perf-val">0.8361</span>
+                  <span class="perf-val">0.8214</span>
                 </div>
                 <div class="perf-row">
                   <span class="perf-name">Logistic Regression</span>
                   <div class="perf-track">
-                    <div class="perf-bar slate" style="width: 83.61%;"></div>
+                    <div class="perf-bar slate" style="width: 82.14%;"></div>
                   </div>
-                  <span class="perf-val">0.8361</span>
+                  <span class="perf-val">0.8214</span>
                 </div>
               </div>
             </div>
@@ -2782,8 +2833,7 @@
                 <div class="key-finding-title">Key Finding</div>
               </div>
               <p class="key-finding-body">
-                The hybrid committee ties the tuned classical SVM at <strong>85.25%</strong> on the Cleveland split. The
-                pure-quantum VQC Ensemble matches Random Forest and Logistic Regression at <strong>83.61%</strong>.
+                The hybrid committee achieves an F1 Score of <strong>0.8364</strong>, tying the tuned classical SVM on the Cleveland split. The pure-quantum VQC Ensemble matches classical baselines at <strong>0.8214</strong>.
               </p>
             </div>
           </div>
@@ -2794,7 +2844,7 @@
              2. PREDICT VIEW
              ============================================ -->
         <div class="view" id="view-predict">
-          <div class="section-card" style="margin-bottom: 24px;">
+          <div class="section-card">
             <h2 class="hero-title" style="font-size: 1.8rem; margin-bottom: 4px;">Risk Assessment</h2>
             <p style="color: var(--color-text-muted); font-size: 0.9rem;">Enter patient clinical data to generate a
               cardiovascular disease risk prediction using the hybrid quantum-classical committee.</p>
@@ -3023,7 +3073,7 @@
              3. BATCH ANALYSIS VIEW
              ============================================ -->
         <div class="view" id="view-batch">
-          <div class="section-card" style="margin-bottom: 24px;">
+          <div class="section-card">
             <h2 class="hero-title" style="font-size: 1.8rem; margin-bottom: 4px;">Batch Analysis</h2>
             <p style="color: var(--color-text-muted); font-size: 0.9rem;">Upload a CSV patient dataset to perform
               high-throughput risk scoring with the hybrid quantum committee.</p>
@@ -3129,13 +3179,13 @@
              4. MODEL COMPARISON VIEW
              ============================================ -->
         <div class="view" id="view-models">
-          <div class="section-card" style="margin-bottom: 24px;">
+          <div class="section-card">
             <h2 class="hero-title" style="font-size: 1.8rem; margin-bottom: 4px;">Model Comparison</h2>
             <p style="color: var(--color-text-muted); font-size: 0.9rem;">Empirical benchmark results comparing quantum
               models, classical baselines, and the stacked hybrid committee.</p>
           </div>
 
-          <div class="section-card" style="margin-bottom: 24px;">
+          <div class="section-card">
             <div class="section-header-row">
               <div>
                 <div class="section-title">Cleveland Benchmark Evaluation (n=303)</div>
@@ -3250,7 +3300,7 @@
              5. METHODOLOGY VIEW
              ============================================ -->
         <div class="view" id="view-methodology">
-          <div class="section-card" style="margin-bottom: 24px;">
+          <div class="section-card">
             <h2 class="hero-title" style="font-size: 1.8rem; margin-bottom: 4px;">Scientific Methodology</h2>
             <p style="color: var(--color-text-muted); font-size: 0.9rem;">Architectural specification of the hybrid
               quantum-classical pipeline, feature encoding, quantum circuits, and out-of-fold stacking meta-learner.</p>
@@ -3272,9 +3322,8 @@
                 2. <strong>StandardScaler</strong>: Zero-mean unit-variance normalization.<br>
                 3. <strong>Supervised ANOVA F-test</strong>: Selects the top-4 features (Thalassemia, Max Heart Rate,
                 Major Vessels, Exercise Angina).<br>
-                4. <strong>Angle Scaling</strong>: Features are mapped to $[0, \pi]$ for quantum rotation gates.<br>
-                5. <strong>Target Binarization</strong>: Cleveland stages $0 \rightarrow$ healthy, $1\text{–}4
-                \rightarrow$ disease present.
+                4. <strong>Angle Scaling</strong>: Features are mapped to [0, π] for quantum rotation gates.<br>
+                5. <strong>Target Binarization</strong>: Cleveland stages 0 → healthy, 1–4 → disease present.
               </div>
             </div>
 
@@ -3283,12 +3332,11 @@
               <div
                 style="font-size: 0.82rem; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 14px;">
                 • <strong>Register</strong>: 4 qubits simulated via PennyLane (`default.qubit`).<br>
-                • <strong>Data Re-uploading</strong>: 4 alternating layers of parameter-scaled $R_Y(\theta)$ rotations
+                • <strong>Data Re-uploading</strong>: 4 alternating layers of parameter-scaled <em>R<sub>Y</sub></em>(θ) rotations
                 and trainable unitary rotations.<br>
                 • <strong>Entanglement Topology</strong>: Ring topology of controlled-NOT (CNOT) gates between adjacent
-                qubits ($q_i \rightarrow q_{i+1}$, $q_3 \rightarrow q_0$).<br>
-                • <strong>Measurement</strong>: Expectation values of multi-qubit Pauli-Z operators $\langle
-                \sigma_z^{(i)} \rangle$.
+                qubits (<em>q<sub>i</sub></em> → <em>q</em><sub><em>i</em>+1</sub>, <em>q</em><sub>3</sub> → <em>q</em><sub>0</sub>).<br>
+                • <strong>Measurement</strong>: Expectation values of multi-qubit Pauli-Z operators ⟨σ<sub><em>z</em></sub><sup>(<em>i</em>)</sup>⟩.
               </div>
 
               <div class="section-title" style="margin-bottom: 12px;">Leakage-Free Stacking Meta-Learner</div>
@@ -3297,6 +3345,136 @@
                 inference. A calibrated Logistic Regression meta-learner computes optimal weights across the quantum and
                 classical members, tuning the decision threshold strictly on training folds.
               </p>
+            </div>
+          </div>
+
+          <!-- ============================================
+               EVALUATION RESULTS & BENCHMARK SUMMARY (TASK #6)
+               ============================================ -->
+          <div class="section-card">
+            <div class="section-header-row">
+              <div>
+                <div class="section-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                  </svg>
+                  Evaluation Results & Benchmark Summary
+                </div>
+                <div class="section-subtitle">Empirical performance on held-out patient data under strict leakage-free evaluation</div>
+              </div>
+              <span class="badge-arch-hybrid">Cleveland Benchmark Split (n=61)</span>
+            </div>
+
+            <!-- 4 Metric Cards Grid -->
+            <div class="methodology-metrics-grid" style="margin-bottom: 20px;">
+              <div class="metric-card">
+                <div class="metric-icon-box teal">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                  </svg>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-label">Benchmark Accuracy</span>
+                  <span class="metric-value">85.25%</span>
+                  <span class="metric-subtext">52 / 61 test patients correct</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-box blue">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-label">Precision</span>
+                  <span class="metric-value">0.8519</span>
+                  <span class="metric-subtext">Positive predictive value</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-box green">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 14 14" />
+                  </svg>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-label">Recall</span>
+                  <span class="metric-value">0.8214</span>
+                  <span class="metric-subtext">Sensitivity (true positive rate)</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-box cyan">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="6" />
+                    <circle cx="12" cy="12" r="2" />
+                  </svg>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-label">F1 Score</span>
+                  <span class="metric-value">0.8364</span>
+                  <span class="metric-subtext">Harmonic mean of prec. & recall</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dataset, Split & Protocol Summary -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 16px; background: var(--color-surface-subtle); border: 1px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: 20px;">
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Dataset</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-main); margin-top: 2px;">Cleveland Primary</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);">n = 303 patients (heart.csv)</div>
+              </div>
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Test Set</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-main); margin-top: 2px;">n = 61 Patients</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);">242 train / 61 test held-out</div>
+              </div>
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Partition Split</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-main); margin-top: 2px;">80 / 20 Stratified</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);">random_state = 42</div>
+              </div>
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Decision Threshold</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-main); margin-top: 2px;">0.530 (Youden's J)</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);">Tuned on OOF train folds only</div>
+              </div>
+            </div>
+
+            <!-- Scientific Context Explanation -->
+            <p style="font-size: 0.85rem; color: var(--color-text-secondary); line-height: 1.6;">
+              <strong>Benchmark Context:</strong> On the official fixed Cleveland benchmark split, the <strong>Hybrid Quantum Committee ties the tuned classical SVM at 85.25%</strong> (52/61 test patients). With <em>n</em> = 61, binomial test noise is approximately ±5 percentage points (each single patient corresponds to 1.64 pp, and independent cross-split re-derivations yield a mean of ~80% ± 2.5%). Rather than asserting unwarranted quantum supremacy, Quemeds demonstrates that integrating 3 real quantum circuits (Quantum Kernel SVM, Variational Quantum Classifier, and Bagged VQC Ensemble) within a leakage-free out-of-fold stacked committee successfully matches top classical baselines on tabular medical records while providing orthogonal quantum representations and full explainability.
+            </p>
+          </div>
+
+          <!-- Methodological Limitations & Boundaries -->
+          <div class="section-card">
+            <div class="section-title" style="margin-bottom: 12px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              Limitations & Research Boundaries
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.84rem; color: var(--color-text-secondary); line-height: 1.6;">
+              <div>
+                • <strong>Tabular QML Boundaries:</strong> Classical decision trees and kernel methods are mature and highly efficient on tabular clinical features. Quantum circuits provide orthogonal nonlinear representation spaces, but do not exhibit asymptotic speedups on small tabular records.<br>
+                • <strong>Qubit Scale:</strong> Statevector simulation is bounded to 4 qubits via PennyLane (`default.qubit`) due to <em>O</em>(2<sup><em>n</em></sup>) classical memory scaling. Real quantum hardware execution remains subject to gate noise and shot variance.
+              </div>
+              <div>
+                • <strong>Sample Size & Noise:</strong> The primary Cleveland dataset contains 303 patients. Binomial test noise on <em>n</em> = 61 underscores that small differences (±1–2 patients) are statistical noise, reinforcing the necessity of honest, leakage-free benchmark reporting.<br>
+                • <strong>Clinical Scope:</strong> Quemeds is an academic research prototype for hybrid quantum-classical algorithms and is strictly not intended for primary clinical diagnosis without prospective medical trial validation.
+              </div>
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ data/heart.csv
 
 .freebuff/
 .vscode/
+qml-disease-prediction-main/
 
 # Keep combined dataset (real UCI patients, not regenerable offline)
 !data/heart_combined.csv
