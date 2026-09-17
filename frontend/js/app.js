@@ -10,6 +10,7 @@ import { initNavigation } from './navigation.js';
 import { initOverview } from './overview.js';
 import { initPredict } from './predict.js';
 import { initBatch } from './batch.js';
+import { initAuth } from './auth.js';
 
 function bootstrap() {
   initTheme();
@@ -17,6 +18,7 @@ function bootstrap() {
   initOverview();
   initPredict();
   initBatch();
+  initAuth();
 }
 
 if (document.readyState === 'loading') {

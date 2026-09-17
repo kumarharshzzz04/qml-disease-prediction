@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/views.css">
   <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/auth.css">
 </head>
 
 <body>
@@ -117,7 +118,58 @@
           </svg>
         </button>
 
-        <div class="user-avatar" title="SIH Finalist Team">M</div>
+        <!-- User Profile & Portal Switcher -->
+        <div class="user-profile-widget" id="user-profile-widget">
+          <button class="user-profile-btn" id="user-profile-btn" aria-label="Quemeds User Profile and Portals">
+            <div class="user-avatar" id="topbar-avatar">M</div>
+            <div class="user-info-text">
+              <span class="user-name" id="topbar-user-name">Dr. Manthan</span>
+              <span class="user-role-badge" id="topbar-role-badge">AIIMS Cardiology</span>
+            </div>
+            <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Profile Dropdown Menu -->
+          <div class="profile-dropdown" id="profile-dropdown">
+            <div class="profile-dropdown-header">
+              <div class="profile-dropdown-avatar" id="dropdown-avatar">M</div>
+              <div class="profile-dropdown-details">
+                <div class="profile-dropdown-name" id="dropdown-name">Dr. Manthan</div>
+                <div class="profile-dropdown-email" id="dropdown-email">m.mehta@aiims.edu</div>
+                <span class="profile-pill" id="dropdown-role-pill">Hospital Account • ABDM Linked</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <div class="profile-dropdown-section-title">Active Persona</div>
+            <button class="profile-menu-item" id="switch-role-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+              <span id="switch-role-text">Switch to Patient Portal</span>
+            </button>
+            <button class="profile-menu-item" id="open-auth-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                <polyline points="10 17 15 12 10 7"></polyline>
+                <line x1="15" y1="12" x2="3" y2="12"></line>
+              </svg>
+              <span>Sign In / Create Account</span>
+            </button>
+            <div class="profile-dropdown-divider"></div>
+            <button class="profile-menu-item danger" id="signout-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Reset to Guest Session</span>
+            </button>
+          </div>
+        </div>
       </header>
 
       <!-- Content Canvas -->
@@ -1164,6 +1216,233 @@
         </div>
 
       </main>
+    </div>
+  </div>
+
+  <!-- ============================================
+       AUTH & PORTAL MODAL (HOSPITAL VS PATIENT)
+       ============================================ -->
+  <div class="auth-modal-backdrop" id="auth-modal-backdrop">
+    <div class="auth-modal" id="auth-modal">
+      <button class="auth-modal-close" id="auth-modal-close" aria-label="Close Portal Modal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Header & SIH Instant Demo -->
+      <div class="auth-header">
+        <div class="auth-brand-row">
+          <svg class="auth-logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="17" fill="#1D4ED8" />
+            <ellipse cx="18" cy="18" rx="13" ry="5.5" stroke="#38BDF8" stroke-width="2" transform="rotate(-28 18 18)" />
+            <circle cx="18" cy="18" r="5" fill="#FFFFFF" />
+            <circle cx="28" cy="13" r="2" fill="#BAE6FD" />
+          </svg>
+          <div>
+            <h2 class="auth-title">Quemeds Clinical Access Portal</h2>
+            <div class="auth-subtitle">Role-Based Hospital & Patient Intelligence Gateway</div>
+          </div>
+        </div>
+
+        <!-- SIH Demo 1-Click Access -->
+        <div class="sih-demo-banner">
+          <div class="sih-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Smart India Hackathon 2026 • 1-Click Demo Profiles
+          </div>
+          <div class="sih-demo-buttons">
+            <button type="button" class="btn-demo-quick hospital" id="demo-hospital-btn">
+              🏥 Demo as Dr. Manthan (AIIMS)
+            </button>
+            <button type="button" class="btn-demo-quick patient" id="demo-patient-btn">
+              👤 Demo as Rahul Sharma (Patient)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <div class="auth-role-selector">
+        <button type="button" class="auth-role-tab active" id="role-tab-hospital">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+          <span>Hospital / Clinician</span>
+        </button>
+        <button type="button" class="auth-role-tab" id="role-tab-patient">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Patient / Individual</span>
+        </button>
+      </div>
+
+      <!-- Action Tabs (Sign In vs Sign Up) -->
+      <div class="auth-action-tabs">
+        <button type="button" class="auth-action-tab active" id="tab-action-signin">Sign In</button>
+        <button type="button" class="auth-action-tab" id="tab-action-signup">Create Account</button>
+      </div>
+
+      <!-- Form Container -->
+      <div class="auth-form-container">
+        <!-- 1. HOSPITAL SIGN IN -->
+        <form class="auth-form active" id="form-hospital-signin">
+          <div class="auth-input-group">
+            <label class="auth-label" for="hosp-signin-id">Hospital Email / Institutional ID</label>
+            <input type="email" id="hosp-signin-id" class="auth-input" value="m.mehta@aiims.edu" required>
+            <span class="auth-hint">e.g. physician@aiims.edu or hospital nodal user</span>
+          </div>
+
+          <div class="auth-input-group">
+            <label class="auth-label" for="hosp-signin-lic">Medical Council Registration / License No.</label>
+            <input type="text" id="hosp-signin-lic" class="auth-input" value="MCI-CARDIO-2024-881" required>
+            <span class="auth-hint">National Medical Commission (NMC) verification index</span>
+          </div>
+
+          <div class="auth-input-group">
+            <label class="auth-label" for="hosp-signin-pwd">Password / Terminal PIN</label>
+            <input type="password" id="hosp-signin-pwd" class="auth-input" value="cardiology2026" required>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <input type="checkbox" id="hosp-signin-rem" checked>
+            <label for="hosp-signin-rem">Remember this institutional terminal for 12 hours</label>
+          </div>
+
+          <button type="submit" class="auth-submit-btn">
+            Sign In to Hospital Portal →
+          </button>
+        </form>
+
+        <!-- 2. HOSPITAL SIGN UP -->
+        <form class="auth-form" id="form-hospital-signup">
+          <div class="auth-form-row">
+            <div class="auth-input-group">
+              <label class="auth-label" for="hosp-signup-org">Hospital / Health Center Name</label>
+              <input type="text" id="hosp-signup-org" class="auth-input" value="AIIMS New Delhi" required>
+            </div>
+            <div class="auth-input-group">
+              <label class="auth-label" for="hosp-signup-nabh">ABDM / NABH Facility ID</label>
+              <input type="text" id="hosp-signup-nabh" class="auth-input" value="HOSP-DEL-ABDM-9941" required>
+            </div>
+          </div>
+
+          <div class="auth-form-row">
+            <div class="auth-input-group">
+              <label class="auth-label" for="hosp-signup-name">Lead Physician / Specialist Name</label>
+              <input type="text" id="hosp-signup-name" class="auth-input" value="Dr. Manthan Mehta" required>
+            </div>
+            <div class="auth-input-group">
+              <label class="auth-label" for="hosp-signup-dept">Clinical Department</label>
+              <input type="text" id="hosp-signup-dept" class="auth-input" value="Department of Cardiology" required>
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <label class="auth-label" for="hosp-signup-email">Official Institutional Email</label>
+            <input type="email" id="hosp-signup-email" class="auth-input" value="manthan.cardio@aiims.edu" required>
+          </div>
+
+          <div class="auth-input-group">
+            <label class="auth-label" for="hosp-signup-pwd">Create Secure Master Password</label>
+            <input type="password" id="hosp-signup-pwd" class="auth-input" value="AiimsCardio#2026" required>
+            <span class="auth-hint">Requires 12+ characters and institutional two-factor auth</span>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <input type="checkbox" id="hosp-signup-agree" checked required>
+            <label for="hosp-signup-agree">I certify that this institution is authorized to process patient diagnostic data under DISHA & ABDM protocols</label>
+          </div>
+
+          <button type="submit" class="auth-submit-btn">
+            Register Hospital & Issue API Keys →
+          </button>
+        </form>
+
+        <!-- 3. PATIENT SIGN IN -->
+        <form class="auth-form" id="form-patient-signin">
+          <div class="auth-input-group">
+            <label class="auth-label" for="pat-signin-id">ABHA ID / UHID / Registered Mobile</label>
+            <input type="text" id="pat-signin-id" class="auth-input" value="rahul.sharma@abdm" required>
+            <span class="auth-hint">14-digit ABHA Number, PHR address, or mobile number</span>
+          </div>
+
+          <div class="auth-input-group">
+            <label class="auth-label" for="pat-signin-otp">Passcode / OTP</label>
+            <input type="password" id="pat-signin-otp" class="auth-input" value="984210" required>
+            <span class="auth-hint">Demo code: 984210</span>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <input type="checkbox" id="pat-signin-rem" checked>
+            <label for="pat-signin-rem">Keep me signed in on this trusted personal device</label>
+          </div>
+
+          <button type="submit" class="auth-submit-btn patient-theme">
+            Access My Health Records →
+          </button>
+        </form>
+
+        <!-- 4. PATIENT SIGN UP -->
+        <form class="auth-form" id="form-patient-signup">
+          <div class="auth-form-row">
+            <div class="auth-input-group">
+              <label class="auth-label" for="pat-signup-name">Full Patient Name</label>
+              <input type="text" id="pat-signup-name" class="auth-input" value="Rahul Sharma" required>
+            </div>
+            <div class="auth-input-group">
+              <label class="auth-label" for="pat-signup-dob">Date of Birth</label>
+              <input type="date" id="pat-signup-dob" class="auth-input" value="1985-06-14" required>
+            </div>
+          </div>
+
+          <div class="auth-form-row">
+            <div class="auth-input-group">
+              <label class="auth-label" for="pat-signup-mobile">Mobile Number</label>
+              <input type="tel" id="pat-signup-mobile" class="auth-input" value="+91 98765 43210" required>
+            </div>
+            <div class="auth-input-group">
+              <label class="auth-label" for="pat-signup-abha">ABHA Health ID (Optional)</label>
+              <input type="text" id="pat-signup-abha" class="auth-input" value="14-9982-4412-8810">
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <label class="auth-label" for="pat-signup-pwd">Create Health Account PIN</label>
+            <input type="password" id="pat-signup-pwd" class="auth-input" value="Patient#2026" required>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <input type="checkbox" id="pat-signup-consent" checked required>
+            <label for="pat-signup-consent">I grant voluntary consent for cardiovascular risk screening using the Quemeds Quantum Committee decision aid</label>
+          </div>
+
+          <button type="submit" class="auth-submit-btn patient-theme">
+            Create Patient Account & Begin Checkup →
+          </button>
+        </form>
+      </div>
+
+      <!-- Security & Regulatory Badges -->
+      <div class="auth-footer-badges">
+        <div class="compliance-item">
+          <span class="dot-verified"></span>
+          <span>ABDM Integrated</span>
+        </div>
+        <div class="compliance-item">
+          <span class="dot-verified"></span>
+          <span>DISHA / HIPAA Data Standard</span>
+        </div>
+        <div class="compliance-item">
+          <span class="dot-verified"></span>
+          <span>256-bit Quantum-Safe Protocol</span>
+        </div>
+      </div>
     </div>
   </div>
 
