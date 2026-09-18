@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/views.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/heart-animation.css">
 </head>
 
 <body>
@@ -203,9 +204,35 @@
 
             <!-- 3D Blue Anatomical Heart with Quantum Orbits & Feature Badges -->
             <div class="hero-visual-wrapper">
-              <div class="hero-heart-container">
+              <div class="hero-heart-container" id="heroHeartScene">
+                <!-- Back orbital rings (behind heart) -->
+                <svg class="orbit-ring orbit-ring-back orbit-ring-1" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="150" cy="150" rx="140" ry="50" />
+                </svg>
+                <svg class="orbit-ring orbit-ring-back orbit-ring-2" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="150" cy="150" rx="130" ry="45" />
+                </svg>
+                <svg class="orbit-ring orbit-ring-back orbit-ring-3" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="150" cy="150" rx="135" ry="48" />
+                </svg>
+
+                <!-- Heart images (unchanged) -->
                 <img src="assets/quantum_heart.png" alt="Quemeds Quantum Heart" class="hero-heart-img light-heart" loading="lazy" />
                 <img src="assets/quantum_heart_dark.png" alt="Quemeds Quantum Heart" class="hero-heart-img dark-heart" loading="lazy" />
+
+                <!-- Front orbital rings (in front of heart) -->
+                <svg class="orbit-ring orbit-ring-front orbit-ring-1" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="150" cy="150" rx="140" ry="50" />
+                </svg>
+                <svg class="orbit-ring orbit-ring-front orbit-ring-2" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="150" cy="150" rx="130" ry="45" />
+                </svg>
+                <svg class="orbit-ring orbit-ring-front orbit-ring-3" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="150" cy="150" rx="135" ry="48" />
+                </svg>
+
+                <!-- Orbital particles -->
+                <canvas class="orbit-particles-canvas" id="orbitParticles"></canvas>
               </div>
               <div class="hero-visual-right">
                 <div class="hero-visual-caption">
@@ -1448,6 +1475,7 @@
 
   <!-- Client-Side State & Controllers (Universal Bundle: works on both file:// and HTTP) -->
   <script src="js/bundle.js"></script>
+  <script src="js/heart-animation.js"></script>
 </body>
 
 </html>
