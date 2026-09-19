@@ -62,7 +62,7 @@ def main():
     ytr = y_train.values.astype(int)
 
     print("\nTraining fixed quantum members on the train split...")
-    qk = QuantumKernelClassifier(n_qubits=4, layers=2)
+    qk = QuantumKernelClassifier(n_qubits=4, layers=4)
     qk.fit(A, ytr, verbose=False)
     ens = QuantumEnsemble(n_qubits=4, layers=4, n_members=N_ENSEMBLE, epochs=EPOCHS, seed=42)
     ens.fit(A, ytr, verbose=False)
@@ -85,12 +85,21 @@ def main():
     oof = np.zeros((n, len(all_names)))
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    print("\nComputing OOF probabilities for all candidate members...")
+    print("\nComputing OOF probabilities for all candidate members (fresh per fold for quantum)...")
     for j, name in enumerate(all_names):
         for tri, vai in cv.split(A, ytr):
-            if name in quantum:
-                # quantum members: reuse top-level fits (predict-only, no mutation)
-                oof[vai, j] = quantum[name].predict_proba(A[vai])[:, 1]
+            if name == "qkernel":
+                m = QuantumKernelClassifier(n_qubits=4, layers=4)
+                m.fit(A[tri], ytr[tri], verbose=False)
+                oof[vai, j] = m.predict_proba(A[vai])[:, 1]
+            elif name == "ensemble":
+                m = QuantumEnsemble(n_qubits=4, layers=4, n_members=N_ENSEMBLE, epochs=EPOCHS, seed=42)
+                m.fit(A[tri], ytr[tri], verbose=False)
+                oof[vai, j] = m.predict_proba(A[vai])[:, 1]
+            elif name == "vqc":
+                m = QuantumModel(n_qubits=4, layers=4, epochs=EPOCHS, seed=42)
+                m.fit(A[tri], ytr[tri], verbose=False)
+                oof[vai, j] = m.predict_proba(A[vai])[:, 1]
             else:
                 m = classical_factories[name](42)
                 m.fit(A[tri], ytr[tri])
