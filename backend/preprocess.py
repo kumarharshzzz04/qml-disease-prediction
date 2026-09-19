@@ -48,6 +48,7 @@ def build_preprocessor(n_components: int = 4):
     """
     return Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
+        # Add indicator for high-missingness columns
         ("scaler", StandardScaler()),
         ("selector", SelectKBest(score_func=f_classif, k=n_components)),
         ("angle", MinMaxScaler(feature_range=(0.0, np.pi)))
@@ -55,21 +56,22 @@ def build_preprocessor(n_components: int = 4):
 
 def fit_preprocessor(X: pd.DataFrame, n_components: int = 4, y=None):
     """
-    Fit the pipeline on the feature matrix X.
-    y is required for the supervised ANOVA feature selection step.
-    Returns the fitted pipeline.
+    Fit pipeline on training fold ONLY. 
+    Selector and scaler must be fit inside each CV loop.
     """
     X = X[FEATURES].copy()
+    # Add indicators for ca/thal/slope before imputation
+    for col in ["ca", "thal", "slope"]:
+        X[f"{col}_missing"] = X[col].isna().astype(int)
+    
     pipe = build_preprocessor(n_components)
     pipe.fit(X, y)
     return pipe
 
 def transform_preprocessor(X: pd.DataFrame, pipe):
-    """
-    Apply the fitted pipeline to new data (same feature set).
-    Returns the selected, angle-scaled array (n_samples, n_components).
-    """
     X = X[FEATURES].copy()
+    for col in ["ca", "thal", "slope"]:
+        X[f"{col}_missing"] = X[col].isna().astype(int)
     return pipe.transform(X)
 
 

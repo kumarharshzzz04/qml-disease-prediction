@@ -397,7 +397,7 @@ class QuantumKernelClassifier:
     def __init__(
         self,
         n_qubits: int = 4,
-        layers: int = 2,
+        layers: int = 4,
         device: str = "default.qubit",
         C: float = 1.0,
         seed: int = 42,
@@ -410,15 +410,16 @@ class QuantumKernelClassifier:
         self._X_train = None
         self._K_train = None
         self._svc = None
+        self.scales = pnp.array(np.ones(self.n_qubits), requires_grad=False)
 
         self.dev = qml.device(self.device_name, wires=self.n_qubits)
 
         # State-preparation circuit for the feature map phi(x).
-        def feature_map(x):
+        def feature_map(x, scales):
             for layer in range(self.layers):
-                qml.AngleEmbedding(np.pi * x, wires=range(self.n_qubits), rotation="Y")
+                qml.AngleEmbedding(np.pi * scales * x, wires=range(self.n_qubits), rotation="Y")
                 qml.AngleEmbedding(
-                    np.full(self.n_qubits, 0.5),
+                    scales * np.full(self.n_qubits, 0.5),
                     wires=range(self.n_qubits),
                     rotation="Z"
                 )
@@ -426,8 +427,8 @@ class QuantumKernelClassifier:
                     qml.CNOT(wires=[i, (i + 1) % self.n_qubits])
 
         @qml.qnode(self.dev, interface="numpy")
-        def state_qnode(x):
-            feature_map(x)
+        def state_qnode(x, scales):
+            feature_map(x, scales)
             return qml.state()
 
         self._state_qnode = state_qnode
@@ -435,7 +436,7 @@ class QuantumKernelClassifier:
     def _states(self, X):
         """Feature-map quantum states for all samples - (n, 2**n_qubits)."""
         X = np.asarray(X, dtype=float)
-        return np.array([np.asarray(self._state_qnode(x)) for x in X])
+        return np.array([np.asarray(self._state_qnode(x, self.scales)) for x in X])
 
     def _kernel(self, X1, X2):
         """Fidelity kernel matrix |<phi(a)|phi(b)>|^2 between two sets."""

@@ -22,3 +22,4 @@ qml-disease-prediction-main/
 !data/heart_combined.csv
 !data/DATASET_PROVENANCE.md
 !data/build_combined.py
+!docs/breast_benchmark.log
