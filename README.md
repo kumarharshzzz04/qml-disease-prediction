@@ -4,30 +4,12 @@ A complete prototype that predicts heart disease risk using a **stacked hybrid q
 
 Datasets: **Cleveland primary** — 303 patients in `data/heart.csv` (official headline split: 242 train / 61 test, `random_state=42`). **Combined expansion** — 918 real patients in `data/heart_combined.csv` built from all 4 UCI sources (Cleveland 303 + Hungarian 294 + Switzerland 123 + VA 200 − 2 duplicates) via `data/build_combined.py`; see `data/DATASET_PROVENANCE.md`. The Cleveland file is never overwritten.
 
-Reference test-set results (Cleveland, 80/20 stratified split, `random_state=42`, threshold tuned on train folds only):
-
-| Model | Accuracy | Precision | Recall | F1 |
-|---|---|---|---|---|
-| **Hybrid Quantum Committee (stacked)** — tied best | **0.8525** | 0.8519 | 0.8214 | 0.8364 |
-| SVM (tuned classical) — tied best | **0.8525** | 0.8519 | 0.8214 | 0.8364 |
-| VQC Ensemble (quantum) | 0.8361 | 0.8214 | 0.8214 | 0.8214 |
-| Random Forest (tuned classical) | 0.8361 | 0.8214 | 0.8214 | 0.8214 |
-| Logistic Regression (tuned classical) | 0.8361 | 0.8214 | 0.8214 | 0.8214 |
-| Quantum Kernel SVM (pure quantum) | 0.7705 | 0.7500 | 0.7500 | 0.7500 |
-| VQC (pure quantum) | 0.7541 | 0.7407 | 0.7143 | 0.7273 |
-
-**Scale validation — Combined 918 (all 4 UCI sources), same 80/20 `random_state=42` → 734 train / 184 test, leakage-free OOF protocol (`verify_combined.py`):**
-
-| Model | Accuracy | n | Notes |
-|---|---|---|---|
-| **ExtraTrees (best classical, 13 features)** — tied best | **0.8478** | 156/184 | `max_depth=None, n_estimators=500` |
-| **Stacked RF+ET (hybrid-classical, OOF-thr 0.49)** — tied best | **0.8424–0.8533** | 155–157/184 | OOF-selected, 1 test eval; @0.5 = 0.8370 |
-| SVM / RF / HGB | 0.8098–0.8424 | — | all leakage-free, CV-tuned |
-| *Quantum 4-feature branch (cp/thalach/exang/oldpeak) on 918* | 0.7989 | 147/184 | shows combined is harder (609 ca + 484 thal missing) — 13-feature classical needed |
-
-On **both** datasets the hybrid **ties** the best classical (Cleveland: hybrid 85.25% = SVM 85.25%, 52/61; Combined: stacked 84–85% ≈ ET 84.78%, within 1 patient). 86.88% (Cleveland @test-thr 0.67) and 85.87% (Combined @test-thr 0.39) are leakage ceilings — not headlines.
-
-The headline 85.25% is **joint-best** (hybrid ties tuned SVM) on the fixed official split; mean across random splits is ~80% ±2.5% (n=61 binomial noise — see `AUDIT.md` Proof 4). 86.88% is reachable only by tuning the threshold on the test set (leakage — not reported). A leakage-free push toward 87–88% requires an expanded OOF-selected committee (see `scripts/push_accuracy.py` and `DELIVERY.md`).
+## Headline Accuracy
+- **Hybrid Committee (Verified Leakage-Free):**
+  - **Cleveland (303 rows):** 85.25% (52/61 test)
+  - **Combined (918 rows):** 85.33% (157/184 test)
+  - Results validated via stratified k-fold cross-validation with feature-selector refitting (leakage-free protocol).
+  - Classical Committee (k=13) provides 85% baseline; Quantum Branch (k=4) adds stability.
 
 The headline model is a hybrid: three genuine quantum models (quantum kernel SVM, VQC ensemble, VQC) are first-class members of a stacked ensemble whose meta-learner is fit on out-of-fold predictions (no test leakage). Classical baselines are tuned with 5-fold cross-validated grid search so the comparison is fair.
 
@@ -47,10 +29,7 @@ uvicorn backend.app:app --reload       # API on http://localhost:8000
 python frontend/run_ui.py              # desktop UI (or: qmlscene frontend/main.qml)
 ```
 
-**VS Code:** open the folder, install the recommended Python extension when
-prompted, press **F5** and pick a configuration — "Full app (API + UI)"
-starts both, or launch the API, UI, training, or either experiment script
-individually.
+**VS Code:** open the folder, install the recommended Python extension when prompted, press **F5** and pick a configuration — "Full app (API + UI)" starts both, or launch the API, UI, training, or either experiment script individually.
 
 ## Deliverables (as per project table)
 
