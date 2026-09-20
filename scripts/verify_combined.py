@@ -96,15 +96,24 @@ def main():
         best_single=max(a1,a2,a3,a4,a5,a6)
         print(f"  >> best single TEST {best_single:.4f}  (classical max)")
 
-        # OOF stacking — train-only
+        # OOF stacking — train-only, preprocessor REFIT per fold so the
+        # selector never sees validation-fold labels (leakage-free).
         models=[svm,lr,rf,et,hgb,knn]
         names=["svm","lr","rf","et","hgb","knn"]
         oof=np.zeros((len(A),6))
         for j in range(6):
-            for tri,vai in cv.split(A, yt):
+            for tri,vai in cv.split(Xtr, yt):
+                if k==13:
+                    # no selector -> transform with the global train-fit pipe
+                    Atri=pipe.transform(Xtr.iloc[tri]); Avai=pipe.transform(Xtr.iloc[vai])
+                else:
+                    # refit imputer+scaler+selector on this fold's train rows
+                    fold_pipe=Pipeline([("imputer",SimpleImputer(strategy="median")),("scaler",StandardScaler()),("selector",SelectKBest(f_classif,k=k)),("angle",MinMaxScaler((0, np.pi)))])
+                    fold_pipe.fit(Xtr.iloc[tri], yt.iloc[tri])
+                    Atri=fold_pipe.transform(Xtr.iloc[tri]); Avai=fold_pipe.transform(Xtr.iloc[vai])
                 m=models[j].__class__(**models[j].get_params())
-                m.fit(A[tri], yt.iloc[tri])
-                oof[vai,j]=m.predict_proba(A[vai])[:,1]
+                m.fit(Atri, yt.iloc[tri])
+                oof[vai,j]=m.predict_proba(Avai)[:,1]
         from sklearn.linear_model import LogisticRegression as LR
         ths=np.linspace(0.05,0.95,181)
         best_idx=[]; rem=set(range(6)); best_oof=-1; best_thr=0.5
@@ -157,10 +166,13 @@ def main():
         print(f"  {name:4s} on shuffled labels (train): {acc:.4f}  {'PASS ~chance' if acc<0.70 else 'FAIL memorizes'}")
 
     heading("SUMMARY — Combined 918, leakage-free")
-    print(" Headline (k=13, leakage-free, OOF-thr 0.495): 85.33% = 157/184  (85.87% @0.5).")
-    print(" Best single classical (k=13 ET): 84.78% = 156/184. Stacked ties/beats it — quantum not required but hybrid (quantum 4q branch + classical 13) would tie same ceiling.")
-    print(" k=4 (quantum size) stacked: 78.26% — insufficient, hence k=13 used for combined headline.")
-    print(" All thresholds from OOF train folds only; test touched once; preprocessor fit on train only.")
+    print(" Headline (k=13, CLASSICAL committee, leakage-free, OOF-thr 0.490): 84.24% = 155/184  (83.70% @0.5).")
+    print(" NOTE: this committee is CLASSICAL ONLY (svm/lr/rf/et/hgb/knn) — it contains NO quantum members.")
+    print(" Best single classical (k=13 ET): 84.78% = 156/184. Stacked RF+ET ties it.")
+    print(" k=4 (quantum feature count) stacked: 78.26% — a classical model on 4 selected features, NOT a quantum result.")
+    print(" Honest quantum comparison on this dataset lives in verify_no_leakage.py (Cleveland): the hybrid committee")
+    print(" with real quantum members (QKernel, bagged VQC, VQC).")
+    print(" All thresholds from OOF train folds only; test touched once; preprocessor fit on train only; selector refit per fold.")
     print(" Run: ./venv/Scripts/python.exe scripts/verify_combined.py")
     print(" Rebuild dataset: python data/build_combined.py  (provenance: data/DATASET_PROVENANCE.md)")
 

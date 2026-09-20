@@ -5,11 +5,11 @@ A complete prototype that predicts heart disease risk using a **stacked hybrid q
 Datasets: **Cleveland primary** — 303 patients in `data/heart.csv` (official headline split: 242 train / 61 test, `random_state=42`). **Combined expansion** — 918 real patients in `data/heart_combined.csv` built from all 4 UCI sources (Cleveland 303 + Hungarian 294 + Switzerland 123 + VA 200 − 2 duplicates) via `data/build_combined.py`; see `data/DATASET_PROVENANCE.md`. The Cleveland file is never overwritten.
 
 ## Headline Accuracy
-- **Hybrid Committee (Verified Leakage-Free):**
-  - **Cleveland (303 rows):** 85.25% (52/61 test)
-  - **Combined (918 rows):** 85.33% (157/184 test)
+- **Committee (Verified Leakage-Free):**
+  - **Cleveland (303 rows):** Hybrid committee **85.25%** (52/61) — includes 3 real quantum members (QKernel, bagged VQC, VQC)
+  - **Combined (918 rows):** **84.24%** (155/184) — this is a *classical* committee (ET/RF with 13 features), used for scale validation only
   - Results validated via stratified k-fold cross-validation with feature-selector refitting (leakage-free protocol).
-  - Classical Committee (k=13) provides 85% baseline; Quantum Branch (k=4) adds stability.
+- **Where quantum lives:** the headlined hybrid committee is on Cleveland (`verify_no_leakage.py`, real QKernel + VQC ensemble + VQC). The combined 918 result is a classical scale-check — the 13-feature quantum branch is experimental and lower accuracy.
 
 The headline model is a hybrid: three genuine quantum models (quantum kernel SVM, VQC ensemble, VQC) are first-class members of a stacked ensemble whose meta-learner is fit on out-of-fold predictions (no test leakage). Classical baselines are tuned with 5-fold cross-validated grid search so the comparison is fair.
 
@@ -199,7 +199,7 @@ while the API is serving:
 ./venv/Scripts/python.exe scripts/verify_no_leakage.py 1 3   # fast proofs (~2 min)
 ./venv/Scripts/python.exe scripts/verify_no_leakage.py       # all 4 proofs (~40 min)
 # -> see AUDIT.md for the written-up methodology and results
-./venv/Scripts/python.exe scripts/verify_combined.py         # Combined 918: 84.78% classical max / 84-85% stacked, same leakage-free protocol (~3 min)
+./venv/Scripts/python.exe scripts/verify_combined.py         # Combined 918: 84.78% classical max / 84.24% stacked, same leakage-free protocol (~3 min)
 # -> see data/DATASET_PROVENANCE.md
 
 # 2. Member-expansion experiment - try to beat the committee by adding

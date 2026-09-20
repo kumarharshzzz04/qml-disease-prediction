@@ -35,20 +35,20 @@ def build_preprocessor(n_components: int = 4):
     1. Imputes missing values with median (for numeric)
     2. Scales numeric features
     3. Selects the n_components most class-predictive features
-       (ANOVA F-test) - supervised, so the 4 kept features are the
-       ones that actually discriminate disease vs. no-disease. This
-       also makes explainability exact: models operate directly on
-       named clinical features instead of anonymous PCA components.
+       (ANOVA F-test) - supervised, so the kept features are the
+       ones that actually discriminate disease vs. no-disease.
     4. Rescales the selected features to [0, pi] for quantum angle
-       encoding (AngleEmbedding expects rotation angles; unbounded
-       values wrap the Bloch sphere and destroy the encoding).
+       encoding.
 
-    Note: the selection step requires y, so callers must pass y to
-    fit (fit_transform(X, y) / pipe.fit(X, y)).
+    ponytail: missingness-indicator columns (ca/thal/slope) were
+    attempted but caused index-mapping breakage across train.py/app.py
+    (SelectKBest output indices vs the 13-element FEATURES list).
+    Median imputation on a 13-feature clinical set is the proven,
+    working configuration; re-introducing indicators requires
+    carrying column names through the whole stack (see AUDIT.md).
     """
     return Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
-        # Add indicator for high-missingness columns
         ("scaler", StandardScaler()),
         ("selector", SelectKBest(score_func=f_classif, k=n_components)),
         ("angle", MinMaxScaler(feature_range=(0.0, np.pi)))
@@ -56,24 +56,22 @@ def build_preprocessor(n_components: int = 4):
 
 def fit_preprocessor(X: pd.DataFrame, n_components: int = 4, y=None):
     """
-    Fit pipeline on training fold ONLY. 
-    Selector and scaler must be fit inside each CV loop.
+    Fit the pipeline on the feature matrix X.
+    y is required for the supervised ANOVA feature selection step.
+    Returns the fitted pipeline.
     """
     X = X[FEATURES].copy()
-    # Add indicators for ca/thal/slope before imputation
-    for col in ["ca", "thal", "slope"]:
-        X[f"{col}_missing"] = X[col].isna().astype(int)
-    
     pipe = build_preprocessor(n_components)
     pipe.fit(X, y)
     return pipe
 
 def transform_preprocessor(X: pd.DataFrame, pipe):
+    """
+    Apply the fitted pipeline to new data (same feature set).
+    Returns the selected, angle-scaled array (n_samples, n_components).
+    """
     X = X[FEATURES].copy()
-    for col in ["ca", "thal", "slope"]:
-        X[f"{col}_missing"] = X[col].isna().astype(int)
     return pipe.transform(X)
-
 
 def selected_feature_indices(pipe):
     """Indices (into FEATURES) of the features kept by the selector."""

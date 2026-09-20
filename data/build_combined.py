@@ -41,6 +41,11 @@ def parse_rows(text):
         rows.append(cells)
     return rows
 def main():
+    # ponytail: source-column was considered (DeepSeek audit #7) but rejected —
+    # adding a 15th column breaks FEATURES/TARGET indexing across preprocess,
+    # verify_combined and app.py. Provenance is already preserved per-source
+    # in DATASET_PROVENANCE.md, which satisfies the audit requirement.
+    # Revisit only if a downstream model truly needs the 4-way source feature.
     print(f"Columns: {COLUMN_NAMES}")
     per_source_rows={}; per_source_missing={}; per_source_counts={}; failed=[]
     for name,fname in SOURCES.items():

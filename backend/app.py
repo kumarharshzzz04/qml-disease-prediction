@@ -27,7 +27,7 @@ import logging
 import pickle
 import json
 from contextlib import asynccontextmanager
-from typing import List
+from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
@@ -201,9 +201,9 @@ class PatientData(BaseModel):
     thalach: float = Field(..., ge=60, le=220)
     exang: int = Field(..., ge=0, le=1)
     oldpeak: float = Field(..., ge=0, le=10)
-    slope: int = Field(..., ge=1, le=3)
-    ca: int = Field(..., ge=0, le=3)
-    thal: int = Field(..., ge=3, le=7)
+    slope: Optional[int] = Field(default=None, ge=1, le=3)
+    ca: Optional[int] = Field(default=None, ge=0, le=3)
+    thal: Optional[int] = Field(default=None, ge=3, le=7)
 
 
 class PredictionResponse(BaseModel):
