@@ -23,3 +23,7 @@ qml-disease-prediction-main/
 !data/DATASET_PROVENANCE.md
 !data/build_combined.py
 !docs/breast_benchmark.log
+
+# Stray duplicate copies (accidental nested artifacts/data)
+backend/backend/
+backend/data/

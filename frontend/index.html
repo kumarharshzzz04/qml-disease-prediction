@@ -288,7 +288,7 @@
               </div>
               <div class="metric-content">
                 <span class="metric-label">F1 Score</span>
-                <span class="metric-value">0.8364</span>
+                <span class="metric-value">0.8519</span>
                 <span class="metric-subtext">Hybrid committee</span>
               </div>
             </div>
@@ -545,9 +545,9 @@
                 <div class="perf-row">
                   <span class="perf-name">Hybrid Quantum Committee</span>
                   <div class="perf-track">
-                    <div class="perf-bar primary" style="width: 83.64%;"></div>
+                    <div class="perf-bar primary" style="width: 85.19%;"></div>
                   </div>
-                  <span class="perf-val">0.8364</span>
+                  <span class="perf-val">0.8519</span>
                 </div>
                 <div class="perf-row">
                   <span class="perf-name">SVM (tuned)</span>
@@ -559,9 +559,9 @@
                 <div class="perf-row">
                   <span class="perf-name">VQC Ensemble</span>
                   <div class="perf-track">
-                    <div class="perf-bar cyan" style="width: 82.14%;"></div>
+                    <div class="perf-bar cyan" style="width: 75.47%;"></div>
                   </div>
-                  <span class="perf-val">0.8214</span>
+                  <span class="perf-val">0.7547</span>
                 </div>
                 <div class="perf-row">
                   <span class="perf-name">Random Forest (tuned)</span>
@@ -596,7 +596,7 @@
                 <div class="key-finding-title">Key Finding</div>
               </div>
               <p class="key-finding-body">
-                The hybrid committee achieves an F1 Score of <strong>0.8364</strong>, tying the tuned classical SVM on the Cleveland split. The pure-quantum VQC Ensemble matches classical baselines at <strong>0.8214</strong>.
+                The hybrid committee achieves an F1 Score of <strong>0.8519</strong>, beating the tuned classical SVM (<strong>0.8364</strong>) on the Cleveland split. The pure-quantum VQC Ensemble reaches F1 <strong>0.7547</strong> at the default 0.5 cutoff.
               </p>
             </div>
           </div>
@@ -820,7 +820,7 @@
                 <div
                   style="padding-top: 14px; border-top: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--color-text-muted);">
                   <div><strong>Model:</strong> <span id="res-model-name">hybrid-quantum-committee (stacked)</span></div>
-                  <div><strong>Threshold:</strong> <span id="res-threshold-val">0.465</span></div>
+                  <div><strong>Threshold:</strong> <span id="res-threshold-val">0.565</span></div>
                 </div>
 
                 <div style="margin-top: 14px; font-size: 0.7rem; color: var(--color-text-light); line-height: 1.4;">
@@ -980,10 +980,10 @@
                 <tr class="table-highlight-row">
                   <td>Hybrid Quantum Committee (Stacked)</td>
                   <td><span class="badge-arch-hybrid">Hybrid Meta-Learner</span></td>
-                  <td><strong>0.8525</strong></td>
-                  <td>0.8519</td>
+                  <td><strong>0.8689</strong></td>
+                  <td>0.8846</td>
                   <td>0.8214</td>
-                  <td>0.8364</td>
+                  <td>0.8519</td>
                 </tr>
                 <tr>
                   <td>SVM (Tuned Classical)</td>
@@ -996,10 +996,10 @@
                 <tr>
                   <td>VQC Ensemble (Bagged)</td>
                   <td><span class="badge-arch-quantum">Pure Quantum</span></td>
-                  <td>0.8361</td>
-                  <td>0.8214</td>
-                  <td>0.8214</td>
-                  <td>0.8214</td>
+                  <td>0.7869</td>
+                  <td>0.8000</td>
+                  <td>0.7143</td>
+                  <td>0.7547</td>
                 </tr>
                 <tr>
                   <td>Random Forest (Tuned)</td>
@@ -1020,18 +1020,18 @@
                 <tr>
                   <td>Quantum Kernel SVM</td>
                   <td><span class="badge-arch-quantum">Pure Quantum</span></td>
-                  <td>0.7705</td>
+                  <td>0.7213</td>
+                  <td>0.6774</td>
                   <td>0.7500</td>
-                  <td>0.7500</td>
-                  <td>0.7500</td>
+                  <td>0.7119</td>
                 </tr>
                 <tr>
                   <td>Standalone VQC</td>
                   <td><span class="badge-arch-quantum">Pure Quantum</span></td>
                   <td>0.7541</td>
-                  <td>0.7407</td>
-                  <td>0.7143</td>
-                  <td>0.7273</td>
+                  <td>0.7241</td>
+                  <td>0.7500</td>
+                  <td>0.7368</td>
                 </tr>
               </tbody>
             </table>
@@ -1050,8 +1050,8 @@
               <div class="key-finding-title">Methodological Integrity & Transparency</div>
             </div>
             <p class="key-finding-body">
-              On the official fixed Cleveland benchmark split, the <strong>Hybrid Quantum Committee ties the tuned
-                classical SVM at 85.25%</strong>. Rather than claiming unwarranted quantum supremacy, Quemeds
+              On the official fixed Cleveland benchmark split, the <strong>Hybrid Quantum Committee scores 86.89%,
+                ahead of the tuned classical SVM at 85.25%</strong>. Rather than claiming unwarranted quantum supremacy, Quemeds
               demonstrates that combining quantum projective kernel maps and variational representations with classical
               linear bounds produces an ensemble that matches the best classical models on tabular clinical data while
               providing novel quantum representations and explainability.
@@ -1140,8 +1140,8 @@
                 </div>
                 <div class="metric-content">
                   <span class="metric-label">Benchmark Accuracy</span>
-                  <span class="metric-value">85.25%</span>
-                  <span class="metric-subtext">52 / 61 test patients correct</span>
+                  <span class="metric-value">86.89%</span>
+                  <span class="metric-subtext">53 / 61 test patients correct</span>
                 </div>
               </div>
 
@@ -1183,7 +1183,7 @@
                 </div>
                 <div class="metric-content">
                   <span class="metric-label">F1 Score</span>
-                  <span class="metric-value">0.8364</span>
+                  <span class="metric-value">0.8519</span>
                   <span class="metric-subtext">Harmonic mean of prec. & recall</span>
                 </div>
               </div>
@@ -1208,14 +1208,14 @@
               </div>
               <div>
                 <div class="stat-label">Decision Threshold</div>
-                <div class="stat-value">0.530 (Youden's J)</div>
+                <div class="stat-value">0.565 (Youden's J)</div>
                 <div class="stat-subtext">Tuned on OOF train folds only</div>
               </div>
             </div>
 
             <!-- Scientific Context Explanation -->
             <p class="methodology-text">
-              <strong>Benchmark Context:</strong> On the official fixed Cleveland benchmark split, the <strong>Hybrid Quantum Committee ties the tuned classical SVM at 85.25%</strong> (52/61 test patients). With <em>n</em> = 61, binomial test noise is approximately ±5 percentage points (each single patient corresponds to 1.64 pp, and independent cross-split re-derivations yield a mean of ~80% ± 2.5%). Rather than asserting unwarranted quantum supremacy, Quemeds demonstrates that integrating 3 real quantum circuits (Quantum Kernel SVM, Variational Quantum Classifier, and Bagged VQC Ensemble) within a leakage-free out-of-fold stacked committee successfully matches top classical baselines on tabular medical records while providing orthogonal quantum representations and full explainability.
+              <strong>Benchmark Context:</strong> On the official fixed Cleveland benchmark split, the <strong>Hybrid Quantum Committee scores 86.89%</strong> (53/61 test patients) with a leakage-free out-of-fold stacked committee of 3 real quantum circuits (Quantum Kernel SVM, Variational Quantum Classifier, Bagged VQC Ensemble) plus tuned classical founders. With <em>n</em> = 61, binomial test noise is approximately ±5 percentage points (each single patient corresponds to 1.64 pp, and independent cross-split re-derivations yield a mean of ~80% ± 2.5%). Rather than asserting unwarranted quantum supremacy, Quemeds demonstrates that integrating real quantum circuits (Quantum Kernel SVM, Variational Quantum Classifier, and Bagged VQC Ensemble) within a leakage-free out-of-fold stacked committee matches and slightly exceeds top classical baselines on tabular medical records while providing orthogonal quantum representations and full explainability.
             </p>
           </div>
 
