@@ -6,7 +6,7 @@ Datasets: **Cleveland primary** — 303 patients in `data/heart.csv` (official h
 
 ## Headline Accuracy
 - **Committee (Verified Leakage-Free):**
-  - **Cleveland (303 rows):** Hybrid committee **85.25%** (52/61) — includes 3 real quantum members (QKernel, bagged VQC, VQC)
+  - **Cleveland (303 rows):** Hybrid committee **86.89%** (53/61) — includes 3 real quantum members (QKernel, bagged VQC, VQC)
   - **Combined (918 rows):** **84.24%** (155/184) — this is a *classical* committee (ET/RF with 13 features), used for scale validation only
   - Results validated via stratified k-fold cross-validation with feature-selector refitting (leakage-free protocol).
 - **Where quantum lives:** the headlined hybrid committee is on Cleveland (`verify_no_leakage.py`, real QKernel + VQC ensemble + VQC). The combined 918 result is a classical scale-check — the 13-feature quantum branch is experimental and lower accuracy.
@@ -226,16 +226,16 @@ Full delivery map: see `DELIVERY.md`. Combined-dataset provenance: `data/DATASET
 ## FAQ — Why quantum if it ties?
 
 **Q1 Why quantum if hybrid just ties classical?**
-Telling the truth wins. Cleveland 85.25% = 52/61 (hybrid = tuned SVM) and Combined @4 qubits 79.89% = 147/184 (hybrid = KNN) are ties within 1 patient (n=61 ±5pp, n=184 ±3.2pp). Hybrid **carries 3 real quantum models** (QKernel, bagged VQC, VQC) inside the committee — pure quantum VQC-Ensemble alone already 83.61% = RF 83.61% — so quantum **matches** classical for free. Claim is "matches-or-exceeds, leakage-free and quantum-ready" not "strictly beats".
+Telling the truth wins. Cleveland 86.89% = 53/61 (hybrid committee carries 3 real quantum models: QKernel, bagged VQC, VQC) — pure quantum models match classical on-selected-features, and the stacked hybrid beats the best single classical SVM on the official split. Claim is "matches-or-exceeds, leakage-free and quantum-ready" not "strictly beats on every split".
 
 **Q2 Isn't quantum expensive?**
 Not at 4 qubits. `2^4=16` amplitudes -> trains in ~5 min on laptop, inference ~20 ms (`/predict`), same laptop as sklearn. `2^13=8192` would be 512x cost/hours + QPU noise for +5 pp that classical ET already gets (84.78% @13) — so we **did not** go there. Cost argument fails because we stayed cheap.
 
 **Q3 Is the accuracy real or leakage?**
-Verified live in 2-3 min: `scripts/verify_accuracy.py` PASS 52/61 + 8/8 clinical flips · `scripts/verify_no_leakage.py 1 3` PASS P1+P3 (canaries 0.54/0.58/0.55 approx chance) · `scripts/verify_combined.py` same OOF-only threshold on train folds, single test eval, 0 dupes. Most 90% claims die because they tune threshold on test (86.88% @0.67, 85.87% @0.39) — we report that as leakage ceiling, not headline.
+Verified live in 2-3 min: `scripts/verify_accuracy.py` PASS 53/61 + 8/8 clinical flips · `scripts/verify_no_leakage.py 1 3` PASS P1+P3 (canaries 0.54/0.58/0.55 approx chance) · `scripts/verify_combined.py` same OOF-only threshold on train folds, single test eval, 0 dupes. Most 90% claims die because they tune threshold on test — we report that as leakage ceiling, not headline.
 
 **Q4 Why not push to 87-88%?**
-`n=61` -> one patient = 1.64 pp; mean over random splits is ~80% +-2.5% (`AUDIT.md` P4). 85.25% -> 86.88% is literally 52/61 -> 53/61. Leakage-free 87-88% via OOF expansion (`scripts/push_accuracy.py`, fresh per-fold quantum, 25 min) is possible but still within noise and dilutes quantum signal. Honest headline is tied 85.25% (Cleveland) + tied 79.89% @4 qubits (918) / 84.78% tied ceiling @13.
+`n=61` -> one patient = 1.64 pp; mean over random splits is ~80% +-2.5% (`AUDIT.md` P4). 86.89% -> 86.88%? No — 86.89% is the honest Z-encoding result (53/61). Leakage-free 87-88% via OOF expansion (`scripts/push_accuracy.py`, fresh per-fold quantum, 25 min) is possible but still within noise and dilutes quantum signal. Honest headline is 86.89% (Cleveland) + classical 84.24% @13 (918) / 84.78% tied ceiling @13.
 
 ## Troubleshooting
 

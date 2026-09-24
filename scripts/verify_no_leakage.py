@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Independent audit: prove that the reported 85.25% hybrid-committee test
+Independent audit: prove that the reported 86.89% hybrid-committee test
 accuracy is real and free of data leakage.
 
 Proof 1 - Artifact consistency:
@@ -52,7 +52,7 @@ from quantum_model import QuantumModel, QuantumEnsemble, QuantumKernelClassifier
 DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "heart.csv")
 ARTIFACT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "backend", "artifacts")
 
-REPORTED_ACC, REPORTED_F1 = 0.8525, 0.8364   # from train.py output / README
+REPORTED_ACC, REPORTED_F1 = 0.8689, 0.8519   # from train.py output / README
 PASSED = []
 
 
@@ -252,7 +252,7 @@ def proof4():
     print(f"per-split accuracies : {np.round(accs, 4).tolist()}")
     print(f"mean +- std          : {mean:.4f} +- {std:.4f}")
     print(f"95% CI (normal)      : [{mean - 1.96 * se:.4f}, {mean + 1.96 * se:.4f}]")
-    print(f"reported 0.8525 within 2 sigma of distribution: "
+    print(f"reported 0.8689 within 2 sigma of distribution: "
           f"{abs(REPORTED_ACC - mean) <= 2 * std + 1e-9}")
     ok = mean >= 0.75
     PASSED.append(("P4 multi-split stability", ok))

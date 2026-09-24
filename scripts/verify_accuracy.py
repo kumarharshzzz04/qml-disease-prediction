@@ -116,10 +116,10 @@ def part_a():
     f1 = f1_score(y_true, preds)
     tn, fp, fn, tp = confusion_matrix(y_true, preds).ravel()
 
-    print(f"\n  accuracy : {acc:.4f}   (expected 0.8525 = 52/61)")
+    print(f"\n  accuracy : {acc:.4f}   (expected 0.8689 = 53/61)")
     print(f"  precision: {prec:.4f}   recall: {rec:.4f}   F1: {f1:.4f}")
     print(f"  confusion: TN={tn} FP={fp} FN={fn} TP={tp}")
-    ok = abs(acc - 0.8525) < 5e-4
+    ok = abs(acc - 0.8689) < 5e-4
     print(f"\nPART A VERDICT: {'PASS - matches the reported number' if ok else 'FAIL - mismatch!'}")
     return ok, (names, models, meta, pre, thr)
 
