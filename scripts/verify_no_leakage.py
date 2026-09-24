@@ -23,7 +23,7 @@ Proof 3 - Chance controls (canaries):
 
 Proof 4 - Uncertainty quantification:
     The full pipeline over 3 independent splits -> accuracy distribution,
-    so the single-split 85.25% can be judged against run-to-run noise.
+    so the single-split 86.89% can be judged against run-to-run noise.
 
 Run:  ./venv/Scripts/python.exe scripts/verify_no_leakage.py [proof ...]
       e.g.  scripts/verify_no_leakage.py 1 3     (fast proofs only)
@@ -117,7 +117,7 @@ def _tune_qkernel_C(qk, K, A, y, grid=(0.1, 0.5, 1.0, 3.0, 10.0)):
     for C in grid:
         accs = []
         for tri, vai in cv.split(K, y):
-            t = QuantumKernelClassifier(n_qubits=4, layers=2, C=C)
+            t = QuantumKernelClassifier(n_qubits=4, layers=4, C=C)
             t._X_train = A[tri]
             t.fit_from_kernel(K[np.ix_(tri, tri)], y[tri], C)
             accs.append(accuracy_score(y[vai], (t.predict_proba(A[vai])[:, 1] >= 0.5).astype(int)))
@@ -126,16 +126,23 @@ def _tune_qkernel_C(qk, K, A, y, grid=(0.1, 0.5, 1.0, 3.0, 10.0)):
     return best_C
 
 
-def _stack_and_threshold(members_factories, A, y):
-    """Out-of-fold stacking + Youden threshold - mirrors train.py exactly."""
+def _stack_and_threshold(members_factories, X_train_raw, y, n_components=4):
+    """Out-of-fold stacking + Youden threshold - mirrors train.py exactly:
+    the full preprocessor (imputer+scaler+SelectKBest) is refit on each
+    fold's train partition, so feature selection never sees the
+    validation fold's labels."""
     names = list(members_factories.keys())
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    oof = np.zeros((A.shape[0], len(names)))
-    for fi, (tri, vai) in enumerate(cv.split(A, y)):
+    oof = np.zeros((X_train_raw.shape[0], len(names)))
+    for fi, (tri, vai) in enumerate(cv.split(X_train_raw, y)):
+        fold_prep = fit_preprocessor(X_train_raw.iloc[tri],
+                                     n_components=n_components, y=y[tri])
+        A_tr = fold_prep.transform(X_train_raw.iloc[tri])
+        A_va = fold_prep.transform(X_train_raw.iloc[vai])
         for j, n in enumerate(names):
             m = members_factories[n]()          # fresh instance per fold
-            m.fit(A[tri], y[tri])
-            oof[vai, j] = m.predict_proba(A[vai])[: , 1]
+            m.fit(A_tr, y[tri])
+            oof[vai, j] = m.predict_proba(A_va)[:, 1]
     meta = LogisticRegression(max_iter=2000).fit(oof, y)
 
     proba_oof = meta.predict_proba(oof)[:, 1]
@@ -162,7 +169,7 @@ def build_full_pipeline(seed, ensemble_members=3, verbose=True):
     ens = QuantumEnsemble(n_qubits=4, layers=4, n_members=ensemble_members,
                           epochs=120, seed=seed)
     ens.fit(A, ytr, verbose=False)
-    qk = QuantumKernelClassifier(n_qubits=4, layers=2)
+    qk = QuantumKernelClassifier(n_qubits=4, layers=4)
     qk.fit(A, ytr, verbose=False)
     best_C = _tune_qkernel_C(qk, qk._K_train, A, ytr)
     qk.fit_from_kernel(qk._K_train, ytr, best_C)
@@ -171,7 +178,7 @@ def build_full_pipeline(seed, ensemble_members=3, verbose=True):
     lr = LogisticRegression(max_iter=2000, random_state=seed).fit(A, ytr)
 
     factories = {
-        "qkernel": lambda: QuantumKernelClassifier(n_qubits=4, layers=2, C=best_C),
+        "qkernel": lambda: QuantumKernelClassifier(n_qubits=4, layers=4, C=best_C),
         "ensemble": lambda: QuantumEnsemble(n_qubits=4, layers=4,
                                             n_members=ensemble_members,
                                             epochs=120, seed=seed),
@@ -179,7 +186,7 @@ def build_full_pipeline(seed, ensemble_members=3, verbose=True):
         "svm": lambda: SVC(kernel="rbf", probability=True, random_state=seed),
         "lr": lambda: LogisticRegression(max_iter=2000, random_state=seed),
     }
-    meta, thr = _stack_and_threshold(factories, A, ytr)
+    meta, thr = _stack_and_threshold(factories, X_train, ytr)
 
     cols = np.column_stack(
         [m.predict_proba(B)[:, 1] for m in (qk, ens, vqc, svm, lr)]
@@ -218,7 +225,7 @@ def proof3():
 
     # (a) quantum kernel + shuffled labels, judged on its own training data
     y_shuf = rng.permutation(ytr)
-    qk = QuantumKernelClassifier(n_qubits=4, layers=2)
+    qk = QuantumKernelClassifier(n_qubits=4, layers=4)
     qk.fit(A, y_shuf, verbose=False)
     k_acc = accuracy_score(y_shuf, qk.predict(A))
 

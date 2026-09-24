@@ -307,7 +307,7 @@ def main():
 
     y_pred_ens = ensemble.predict(X_test_transformed)
     ens_metrics = _metrics(y_test, y_pred_ens)
-    print(f"  VQC Ensemble (7 members) Accuracy: {ens_metrics['accuracy']:.4f}")
+    print(f"  VQC Ensemble (5 members) Accuracy: {ens_metrics['accuracy']:.4f}")
 
     y_pred_qk = qkernel.predict(X_test_transformed)
     qk_metrics = _metrics(y_test, y_pred_qk)
@@ -324,10 +324,10 @@ def main():
         return (p >= 0.5).astype(int)
 
     y_pred_committee = _quantum_committee(X_test_transformed)
-    committee_metrics = _metrics(y_test, y_pred_committee)
+    quantum_committee_metrics = _metrics(y_test, y_pred_committee)
     print(
         f"  Quantum Committee (kernel + ensemble + VQC) Accuracy: "
-        f"{committee_metrics['accuracy']:.4f}"
+        f"{quantum_committee_metrics['accuracy']:.4f}"
     )
     print()
 
@@ -336,8 +336,6 @@ def main():
     classical_results, rf_importance, fitted_classical = train_classical_baselines(
         X_train_transformed, X_test_transformed, y_train.values, y_test.values
     )
-    classical_svm_proba = fitted_classical["SVM"].predict_proba
-    classical_lr_proba = fitted_classical["Logistic Regression"].predict_proba
     # Expand the RF importances of the selected features to a full
     # 13-vector (zeros elsewhere) for plotting and explainability.
     feature_importance = np.zeros(len(FEATURES))

@@ -195,7 +195,7 @@ Two ready-made scripts live in `scripts/` — both standalone, both safe to run
 while the API is serving:
 
 ```bash
-# 1. Leakage audit - Cleveland 303 (85.25% is real and leakage-free)
+# 1. Leakage audit - Cleveland 303 (86.89% is real and leakage-free)
 ./venv/Scripts/python.exe scripts/verify_no_leakage.py 1 3   # fast proofs (~2 min)
 ./venv/Scripts/python.exe scripts/verify_no_leakage.py       # all 4 proofs (~40 min)
 # -> see AUDIT.md for the written-up methodology and results
