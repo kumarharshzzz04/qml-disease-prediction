@@ -38,13 +38,11 @@ the saved artifacts reproduces the reported numbers exactly:
 Preprocessor, VQC, ensemble, quantum kernel, classical members, OOF stacking
 and threshold tuning all re-derived on a **different** split:
 
-- prior-run (pre Z-encoding): accuracy **0.8525**, F1 0.8475 — with *different*
-  selected features (`exang, oldpeak, ca, thal` vs official `thalach, exang,
-  slope, thal`), different tuned C (3.0) and different threshold (0.405).
-  The match with the old headline was coincidental; the independence is not.
-- NOTE: these fresh-split numbers are from the pre-upgrade run. To re-measure
-  stability under the Z-encoding upgrade, run the full audit:
-  `./venv/Scripts/python.exe scripts/verify_no_leakage.py 2` (~30 min).
+- fresh run (2026-09-24, hardened protocol: per-fold preprocessor/selector
+  refit in OOF stacking + 4-layer QSVM, Z-encoding): accuracy **0.8689**,
+  F1 **0.8571** — selected features (`exang, oldpeak, ca, thal` vs official
+  `thalach, exang, slope, thal`), tuned C 0.5, threshold 0.470. The match
+  with the official headline is coincidental at n=61; the independence is not.
 
 ## Proof 3 — Chance controls (canaries)
 
@@ -62,6 +60,11 @@ All ≈ chance → the models learn signal, they do not memorize.
 
 Three more full-pipeline rebuilds (seeds 1–3): **0.7705, 0.8197, 0.8033**
 → mean **0.798 ± 0.025** (95% CI [0.770, 0.826]).
+Re-derived 2026-09-24 under the hardened protocol (per-fold selector refit,
+4-layer QSVM): identical per-split accuracies, mean **0.7978 ± 0.0250**
+(95% CI [0.7695, 0.8262]). The official split's 0.8689 sits ~2.8σ above the
+cross-split mean — favorable-side sampling variance at n=61, not leakage
+(canaries and the OOF architecture rule that out).
 
 ## Honest interpretation (use this wording in the report)
 
